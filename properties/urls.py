@@ -7,7 +7,6 @@ from .views import (
 )
 
 def api_root(request):
-    # return a simple index for /api/
     return JsonResponse({
         "register": "/api/register/",
         "login": "/api/login/",
