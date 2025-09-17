@@ -1,6 +1,7 @@
+# properties/serializers.py
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.models import User
 from .models import Property, Favorite
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,11 +13,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "username", "password")
+        fields = ("id", "username", "password", "email", "first_name", "last_name")
+        extra_kwargs = {"email": {"required": False, "allow_blank": True},
+                        "first_name": {"required": False, "allow_blank": True},
+                        "last_name": {"required": False, "allow_blank": True}}
 
     def create(self, validated_data):
-        # ensure hashed password and username uniqueness handled by validator
-        user = User.objects.create_user(**validated_data)
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
 
 class PropertySerializer(serializers.ModelSerializer):
