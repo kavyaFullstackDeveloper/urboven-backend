@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-u@p+^fcxtk1q6b^-3kc21t$f7_q%_-c4lg45ewbktqgjvzal)!
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["urboven-backend-1.onrender.com", "127.0.0.1", "localhost"]
 
 
 INSTALLED_APPS = [
