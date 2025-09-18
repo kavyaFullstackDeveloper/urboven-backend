@@ -1,132 +1,139 @@
-
 from pathlib import Path
+import os
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-u@p+^fcxtk1q6b^-3kc21t$f7_q%_-c4lg45ewbktqgjvzal)!"
+)
 
-SECRET_KEY = 'django-insecure-u@p+^fcxtk1q6b^-3kc21t$f7_q%_-c4lg45ewbktqgjvzal)!'
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-DEBUG = True
+ALLOWED_HOSTS = [
+    "urboven-backend-1.onrender.com",
+    "127.0.0.1",
+    "localhost",
+]
 
-ALLOWED_HOSTS = ["urboven-backend-1.onrender.com", "127.0.0.1", "localhost"]
-
-
+# -------------------
+# Applications
+# -------------------
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'whitenoise.runserver_nostatic', 
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'properties',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "corsheaders",
+    "properties",
 ]
 
 MIDDLEWARE = [
-
-'django.middleware.security.SecurityMiddleware',
-
-'whitenoise.middleware.WhiteNoiseMiddleware',
-
-'django.contrib.sessions.middleware.SessionMiddleware',
-
-'corsheaders.middleware.CorsMiddleware',
-
-'django.middleware.common.CommonMiddleware',
-
-'django.middleware.csrf.CsrfViewMiddleware',
-
-'django.contrib.auth.middleware.AuthenticationMiddleware',
-
-'django.contrib.messages.middleware.MessageMiddleware',
-
-'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = "backend.wsgi.application"
 
+# -------------------
+# Database
+# -------------------
+# Render provides DATABASE_URL in production
+if os.getenv("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Use SQLite locally
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
-
-DATABASES = {
-"default": dj_database_url.config(
-default="postgresql://postgres:postgres@localhost:5432/urboven",
-conn_max_age=600,
-conn_health_checks=True,
-)
-}
-
-
+# -------------------
+# Password validation
+# -------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+# -------------------
+# Internationalization
+# -------------------
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
-
 USE_TZ = True
 
-
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# -------------------
+# Static & Media
+# -------------------
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
-'staticfiles': {
-'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
 }
-}
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
-
+# -------------------
+# CORS
+# -------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://urboven.vercel.app"
+    "https://urboven.vercel.app",
 ]
+CORS_ALLOW_ALL_ORIGINS = True
 
+# -------------------
+# DRF & JWT
+# -------------------
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
 }
 
-CORS_ALLOW_ALL_ORIGINS = True 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
